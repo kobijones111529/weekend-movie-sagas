@@ -32,7 +32,8 @@ function MovieDetails () {
               <img src={movie.poster} />
               <h1>{movie.title}</h1>
               <p>{movie.description}</p>
-              <img src={movie.image} />
+              <h4>Genres</h4>
+              <p>{movie.genres.map(genre => genre.name).join(' | ')}</p>
             </>
           )}
     </main>
