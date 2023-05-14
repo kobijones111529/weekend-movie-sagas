@@ -1,7 +1,7 @@
-import './MovieList.css'
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
+import styles from './MovieList.module.css'
 
 function MovieList () {
   const dispatch = useDispatch()
@@ -14,7 +14,7 @@ function MovieList () {
   return (
     <main>
       <h1>MovieList</h1>
-      <section className="movies">
+      <section className={styles.movies}>
         {movies.map(movie => {
           return (
             <div key={movie.id} >

@@ -1,32 +1,36 @@
-import './App.css'
 import React from 'react'
 import { Link, Route, HashRouter as Router, Switch } from 'react-router-dom'
 import MovieDetails from '../MovieDetails/MovieDetails.jsx'
 import MovieList from '../MovieList/MovieList.jsx'
+import styles from './App.module.css'
 
 function App () {
   return (
-    <div className="App">
+    <div className={styles.App}>
       <Router>
-        <h1>
-          <Link to="/">
-            The Movies Saga!
-          </Link>
-        </h1>
+        <header className={styles.header}>
+          <h1>
+            <Link to="/">
+              The Movies Saga!
+            </Link>
+          </h1>
+        </header>
 
-        <Switch>
-          <Route path="/" exact>
-            <MovieList />
-          </Route>
+        <div>
+          <Switch>
+            <Route path="/" exact>
+              <MovieList />
+            </Route>
 
-          <Route exact path="/details/:id">
-            <MovieDetails />
-          </Route>
+            <Route exact path="/details/:id">
+              <MovieDetails />
+            </Route>
 
-          <Route path="/">
-            <p>Couldn&apos;t find page</p>
-          </Route>
-        </Switch>
+            <Route path="/">
+              <p>Couldn&apos;t find page</p>
+            </Route>
+          </Switch>
+        </div>
 
         {/* Add Movie page */}
       </Router>
