@@ -4,10 +4,41 @@ const pool = require('../modules/pool')
 const router = express.Router()
 
 router.get('/', (req, res) => {
-  const query = 'SELECT * FROM movies ORDER BY "title" ASC'
+  const query = `
+    SELECT
+      "movies"."id" AS "id",
+      "movies"."title" AS "title",
+      "movies"."poster" AS "poster",
+      "movies"."description" AS "description",
+      "genres"."id" AS "genreId",
+      "genres"."name" AS "genreName"
+    FROM "movies"
+    JOIN "movies_genres"
+      ON "movies"."id" = "movies_genres"."movie_id"
+    JOIN "genres"
+      ON "movies_genres"."genre_id" = "genres"."id"
+    ORDER BY "movies"."title" ASC
+  `
   pool.query(query)
     .then(result => {
-      res.send(result.rows)
+      const map = result.rows.reduce((out, row) => {
+        const existing = out.get(row.id)
+        if (existing === undefined) {
+          out.set(row.id, {
+            id: row.id,
+            title: row.title,
+            poster: row.poster,
+            description: row.description,
+            genres: [{ id: row.genreId, name: row.genreName }]
+          })
+        } else {
+          existing.genres.push({ id: row.genreId, name: row.genreName })
+        }
+
+        return out
+      }, new Map())
+
+      res.send([...map.values()])
     })
     .catch(err => {
       console.log('ERROR: Get all movies', err)
