@@ -17,7 +17,7 @@ router.get('/', (req, res) => {
       ON "movies"."id" = "movies_genres"."movie_id"
     JOIN "genres"
       ON "movies_genres"."genre_id" = "genres"."id"
-    ORDER BY "movies"."title" ASC
+    ORDER BY "movies"."title" ASC;
   `
   pool.query(query)
     .then(result => {
@@ -42,6 +42,56 @@ router.get('/', (req, res) => {
     })
     .catch(err => {
       console.log('ERROR: Get all movies', err)
+      res.sendStatus(500)
+    })
+})
+
+router.get('/:id', (req, res) => {
+  const id = req.params.id
+
+  const query = `
+    SELECT
+      "movies"."id" AS "id",
+      "movies"."title" AS "title",
+      "movies"."poster" AS "poster",
+      "movies"."description" AS "description",
+      "genres"."id" AS "genreId",
+      "genres"."name" AS "genreName"
+    FROM "movies"
+    JOIN "movies_genres"
+      ON "movies"."id" = "movies_genres"."movie_id"
+    JOIN "genres"
+      ON "movies_genres"."genre_id" = "genres"."id"
+    WHERE "movies"."id" = $1
+    ORDER BY "genres"."name";
+  `
+  pool.query(query, [id])
+    .then(result => {
+      const map = result.rows.reduce((out, row) => {
+        const existing = out.get(row.id)
+        if (existing === undefined) {
+          out.set(row.id, {
+            id: row.id,
+            title: row.title,
+            poster: row.poster,
+            description: row.description,
+            genres: [{ id: row.genreId, name: row.genreName }]
+          })
+        } else {
+          existing.genres.push({ id: row.genreId, name: row.genreName })
+        }
+
+        return out
+      }, new Map())
+      const values = [...map.values()]
+      if (values.length < 1) {
+        res.sendStatus(404)
+      } else {
+        res.send(values[0])
+      }
+    })
+    .catch(err => {
+      console.error(err)
       res.sendStatus(500)
     })
 })

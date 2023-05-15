@@ -1,23 +1,24 @@
-import React, { useEffect, useMemo } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import axios from 'axios'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 function MovieDetails () {
-  const dispatch = useDispatch()
-  const movies = useSelector(store => store.movies)
+  const [movie, setMovie] = useState(undefined)
   const params = useParams()
-
-  useEffect(() => {
-    dispatch({ type: 'FETCH_MOVIES' })
-  }, [])
 
   const { id } = useMemo(() => {
     return { id: Number(params.id) }
   }, [params])
 
-  const movie = useMemo(() => {
-    return movies.find(movie => movie.id === id)
-  }, [movies, id])
+  useEffect(() => {
+    axios.get(`/api/movie/${id}`)
+      .then(response => {
+        setMovie(response.data)
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  }, [])
 
   return (
     <main>
